@@ -26,19 +26,16 @@ func Extract(url string) ([]string, error) {
 	defer func() {
 		resp.Body.Close()
 	}()
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("getting %s: %s", url, resp.Status)
-	}
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
+		return nil, fmt.Errorf("parsing %s: %v",url, err)
 	}
-	var links []string
-	visitAll := func(n *html.Node) {
+	links := make([]string, 0)
+	forEachNode(doc, func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "a" {
 			for _, a := range n.Attr {
 				if a.Key == "href" {
-					link, err := resp.Request.URL.Parse(a.Val)
+					link, err := resp.Request.URL.Parse(a.Val);
 					if err != nil {
 						continue
 					}
@@ -46,7 +43,6 @@ func Extract(url string) ([]string, error) {
 				}
 			}
 		}
-	}
-	forEachNode(doc, visitAll, nil)
+	}, nil)
 	return links, nil
 }

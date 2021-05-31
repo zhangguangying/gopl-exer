@@ -25,10 +25,9 @@ var prereqs = map[string][]string{
 }
 
 func toposort(m map[string][]string) []string {
-	var order []string
+	order := make([]string, 0)
 	seen := make(map[string]bool)
-	var visitAll func([]string)
-
+	var visitAll func(items []string)
 	visitAll = func(items []string) {
 		for _, item := range items {
 			if !seen[item] {
@@ -38,9 +37,8 @@ func toposort(m map[string][]string) []string {
 			}
 		}
 	}
-
 	var keys []string
-	for key, _ := range prereqs {
+	for key := range m {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
